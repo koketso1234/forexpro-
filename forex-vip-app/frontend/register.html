@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - ForexPro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0D0D0D;
+            color: #FFFFFF;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(13, 13, 13, 0.98);
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        .navbar .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            text-decoration: none;
+            color: #FFFFFF;
+        }
+        .logo span { color: #6C63FF; }
+        .logo small { font-size: 12px; color: #6C63FF; font-weight: 400; margin-left: 5px; }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px;
+            gap: 4px;
+        }
+        .hamburger span {
+            width: 28px;
+            height: 2px;
+            background: #FFFFFF;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            list-style: none;
+        }
+        .nav-links a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+        .nav-links a:hover {
+            color: #FFFFFF;
+            background: rgba(108, 99, 255, 0.1);
+        }
+        .nav-links a.active {
+            color: #6C63FF;
+            background: rgba(108, 99, 255, 0.1);
+        }
+
+        .btn-nav {
+            background: linear-gradient(135deg, #6C63FF, #00D4FF);
+            color: #FFFFFF !important;
+            padding: 8px 25px !important;
+            border-radius: 25px !important;
+            font-weight: 700 !important;
+        }
+        .btn-nav:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 25px rgba(108, 99, 255, 0.3);
+        }
+
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+        .nav-overlay.active { display: block; }
+
+        .risk-banner {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #888;
+            padding: 8px 20px;
+            text-align: center;
+            font-size: 11px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .risk-banner strong { color: #6C63FF; }
+
+        .register-container {
+            max-width: 450px;
+            margin: 40px auto;
+            padding: 35px 30px;
+            background: #1A1A1A;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .register-container .brand-icon {
+            text-align: center;
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .register-container h1 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .register-container h1 span { color: #6C63FF; }
+        .register-container .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            color: #888;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #6C63FF;
+            box-shadow: 0 0 20px rgba(108, 99, 255, 0.05);
+        }
+        .form-group select option { background: #1A1A1A; }
+
+        .account-type-selector {
+            display: flex;
+            gap: 12px;
+            margin: 5px 0;
+        }
+        .account-type-option {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .account-type-option:hover { border-color: #6C63FF; }
+        .account-type-option.selected {
+            border-color: #6C63FF;
+            background: rgba(108, 99, 255, 0.05);
+        }
+        .account-type-option .type-icon { font-size: 28px; display: block; }
+        .account-type-option .type-name { font-size: 15px; font-weight: 700; color: #fff; margin-top: 4px; }
+        .account-type-option .type-price { font-size: 13px; color: #6C63FF; }
+
+        .admin-code-field {
+            border: 1px dashed rgba(108, 99, 255, 0.15);
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .admin-code-field .helper {
+            font-size: 11px;
+            color: #555;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #6C63FF, #00D4FF);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 5px;
+        }
+        .btn-register:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 40px rgba(108, 99, 255, 0.3);
+        }
+        .btn-register:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #888;
+            font-size: 14px;
+        }
+        .register-footer a {
+            color: #6C63FF;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .error-message {
+            background: rgba(255, 23, 68, 0.1);
+            border: 1px solid #FF1744;
+            color: #FF6B81;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+            text-align: center;
+            font-size: 14px;
+        }
+        .error-message.show { display: block; }
+
+        .success-message {
+            background: rgba(0, 230, 118, 0.1);
+            border: 1px solid #00E676;
+            color: #69F0AE;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+            text-align: center;
+            font-size: 14px;
+        }
+        .success-message.show { display: block; }
+
+        .terms-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 12px 0 15px;
+            font-size: 13px;
+            color: #888;
+        }
+        .terms-check input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #6C63FF;
+        }
+        .terms-check a {
+            color: #6C63FF;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .account-type-selector { flex-direction: column; }
+            .register-container { margin: 20px 15px; padding: 25px 20px; }
+        }
+        @media (max-width: 480px) {
+            .register-container h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="risk-banner">
+        ⚠️ <strong>RISK WARNING:</strong> Forex trading carries substantial risk. Only trade with funds you can afford to lose.
+    </div>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Forex<span>Pro</span><small>🇿🇦</small></a>
+            <button class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="market.html">Market</a></li>
+                <li><a href="chat.html">Chat</a></li>
+                <li><a href="profile.html">👤 Profile</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html" class="active btn-nav">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <div class="register-container">
+        <div class="brand-icon">📈</div>
+        <h1>Create <span>Account</span></h1>
+        <p class="subtitle">Join ForexPro and start trading</p>
+
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+
+        <form id="registerForm" onsubmit="handleRegister(event)">
+            <div class="form-group">
+                <label>👤 Full Name</label>
+                <input type="text" id="name" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label>📧 Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label>📱 Phone Number</label>
+                <input type="tel" id="phone" placeholder="+27 82 123 4567" required>
+            </div>
+
+            <div class="form-group">
+                <label>🔑 Password</label>
+                <input type="password" id="password" placeholder="Min 8 characters" required minlength="8">
+            </div>
+
+            <div class="form-group">
+                <label>💎 Account Type</label>
+                <div class="account-type-selector">
+                    <div class="account-type-option selected" data-type="free" onclick="selectAccountType(this)">
+                        <span class="type-icon">🆓</span>
+                        <div class="type-name">Free</div>
+                        <div class="type-price">R0 / month</div>
+                    </div>
+                    <div class="account-type-option" data-type="paid" onclick="selectAccountType(this)">
+                        <span class="type-icon">💎</span>
+                        <div class="type-name">Premium</div>
+                        <div class="type-price">R1,850 / month</div>
+                    </div>
+                </div>
+                <input type="hidden" id="accountType" value="free">
+            </div>
+
+            <div class="form-group admin-code-field">
+                <label>👑 Admin Code <span style="color:#555;font-weight:400;font-size:12px;">(Optional)</span></label>
+                <input type="text" id="adminCode" placeholder="Enter admin code">
+                <span class="helper">💡 Enter the admin code to get FREE admin access</span>
+            </div>
+
+            <div class="terms-check">
+                <input type="checkbox" id="agree" required>
+                <label for="agree">I agree to the <a href="#">Terms</a> &amp; <a href="#">Risk Disclosure</a></label>
+            </div>
+
+            <button type="submit" class="btn-register" id="registerBtn">🚀 Create Account</button>
+        </form>
+
+        <div class="register-footer">Already have an account? <a href="login.html">Login</a></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch(`${API_URL}/auth/me`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            }).then(res => {
+                if (res.ok) window.location.href = 'dashboard.html';
+            }).catch(() => localStorage.removeItem('token'));
+        }
+
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        const navOverlay = document.getElementById('navOverlay');
+
+        if (hamburger) {
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                navOverlay.classList.toggle('active');
+                document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : 'auto';
+            });
+        }
+
+        if (navOverlay) {
+            navOverlay.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        }
+
+        document.querySelectorAll('.nav-links a').forEach(item => {
+            item.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        function selectAccountType(el) {
+            document.querySelectorAll('.account-type-option').forEach(p => p.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('accountType').value = el.dataset.type;
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const accountType = document.getElementById('accountType').value;
+            const adminCode = document.getElementById('adminCode').value.trim();
+
+            const btn = document.getElementById('registerBtn');
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+
+            errorDiv.classList.remove('show');
+            successDiv.classList.remove('show');
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Creating account...';
+
+            try {
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, phone, password, accountType, adminCode, plan: 'monthly' })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('token', data.token);
+
+                    if (data.user.isAdmin) {
+                        successDiv.textContent = '✅ 👑 Admin account created for FREE! Redirecting...';
+                    } else if (accountType === 'paid') {
+                        successDiv.textContent = '✅ 💎 Premium account created! Redirecting...';
+                    } else {
+                        successDiv.textContent = '✅ 🆓 Free account created! Redirecting...';
+                    }
+                    successDiv.classList.add('show');
+
+                    setTimeout(() => window.location.href = 'dashboard.html', 1500);
+                } else {
+                    errorDiv.textContent = '❌ ' + (data.error || 'Registration failed');
+                    errorDiv.classList.add('show');
+                    btn.disabled = false;
+                    btn.textContent = '🚀 Create Account';
+                }
+            } catch (error) {
+                errorDiv.textContent = '❌ Connection error. Make sure the server is running.';
+                errorDiv.classList.add('show');
+                btn.disabled = false;
+                btn.textContent = '🚀 Create Account';
+                console.error('Register error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForexPro - Premium Trading Signals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0D0D0D;
+            color: #FFFFFF;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(13, 13, 13, 0.98);
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        .navbar .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            text-decoration: none;
+            color: #FFFFFF;
+        }
+        .logo span { color: #6C63FF; }
+        .logo small { font-size: 12px; color: #6C63FF; font-weight: 400; margin-left: 5px; }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px;
+            gap: 4px;
+        }
+        .hamburger span {
+            width: 28px;
+            height: 2px;
+            background: #FFFFFF;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            list-style: none;
+        }
+        .nav-links a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+        .nav-links a:hover {
+            color: #FFFFFF;
+            background: rgba(108, 99, 255, 0.1);
+        }
+        .nav-links a.active {
+            color: #6C63FF;
+            background: rgba(108, 99, 255, 0.1);
+        }
+
+        .btn-nav {
+            background: linear-gradient(135deg, #6C63FF, #00D4FF);
+            color: #FFFFFF !important;
+            padding: 8px 25px !important;
+            border-radius: 25px !important;
+            font-weight: 700 !important;
+        }
+        .btn-nav:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 25px rgba(108, 99, 255, 0.3);
+        }
+
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+        .nav-overlay.active { display: block; }
+
+        .risk-banner {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #888;
+            padding: 8px 20px;
+            text-align: center;
+            font-size: 11px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .risk-banner strong { color: #6C63FF; }
+
+        .hero {
+            padding: 80px 0;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+        .hero h1 span {
+            background: linear-gradient(135deg, #6C63FF, #00D4FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 18px;
+            color: #888;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-hero-primary {
+            background: linear-gradient(135deg, #6C63FF, #00D4FF);
+            color: #fff;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        .btn-hero-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(108, 99, 255, 0.3);
+        }
+        .btn-hero-secondary {
+            border: 2px solid #6C63FF;
+            color: #6C63FF;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+        .btn-hero-secondary:hover {
+            background: #6C63FF;
+            color: #fff;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 50px;
+        }
+        .stats div { text-align: center; }
+        .stat-number {
+            display: block;
+            font-size: 32px;
+            font-weight: 800;
+            color: #6C63FF;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .features {
+            padding: 80px 0;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .features h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 50px;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background: #1A1A1A;
+            padding: 30px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(108, 99, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(108, 99, 255, 0.05);
+        }
+        .feature-card .icon { font-size: 40px; margin-bottom: 15px; }
+        .feature-card h3 { margin-bottom: 10px; color: #fff; }
+        .feature-card p { color: #888; font-size: 14px; }
+
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        footer p { color: #666; font-size: 13px; }
+        footer .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        footer .footer-links a {
+            color: #666;
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.3s;
+        }
+        footer .footer-links a:hover { color: #6C63FF; }
+
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 75%;
+                max-width: 300px;
+                height: 100vh;
+                background: #1A1A1A;
+                flex-direction: column;
+                justify-content: center;
+                gap: 20px;
+                transition: right 0.3s;
+                padding: 40px;
+                border-left: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            .nav-links.active { right: 0; }
+            .nav-links a {
+                font-size: 18px;
+                color: #fff;
+                padding: 10px 0;
+                width: 100%;
+                text-align: center;
+            }
+            .btn-nav { text-align: center !important; }
+            .hero h1 { font-size: 32px; }
+            .stats { flex-direction: column; gap: 20px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .hero-buttons { flex-direction: column; align-items: center; }
+            .hero-buttons a { width: 100%; max-width: 300px; text-align: center; }
+        }
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 26px; }
+            .logo { font-size: 20px; }
+            .risk-banner { font-size: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="risk-banner">
+        ⚠️ <strong>RISK WARNING:</strong> Forex trading carries substantial risk. Only trade with funds you can afford to lose.
+    </div>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Forex<span>Pro</span><small>🇿🇦</small></a>
+            <button class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="market.html">Market</a></li>
+                <li><a href="chat.html">Chat</a></li>
+                <li><a href="profile.html">👤 Profile</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html" class="btn-nav">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Trade Smarter with <span>Forex Signals</span></h1>
+            <p>Get daily premium trading signals with high accuracy. Join thousands of successful traders.</p>
+            <div class="hero-buttons">
+                <a href="register.html" class="btn-hero-primary">🚀 Start Trading</a>
+                <a href="#features" class="btn-hero-secondary">Learn More</a>
+            </div>
+            <div class="stats">
+                <div><span class="stat-number">2,847+</span><span class="stat-label">Active Members</span></div>
+                <div><span class="stat-number">78%</span><span class="stat-label">Win Rate</span></div>
+                <div><span class="stat-number">4.8⭐</span><span class="stat-label">User Rating</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Why Choose <span style="color:#6C63FF;">ForexPro</span>?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon">📊</div>
+                    <h3>Premium Signals</h3>
+                    <p>5-10 high-quality signals daily with entry, SL, and TP levels</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">⚡</div>
+                    <h3>Real-Time Alerts</h3>
+                    <p>Instant notifications via email and Telegram</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📈</div>
+                    <h3>ZAR Pairs Included</h3>
+                    <p>USD/ZAR, EUR/ZAR, GBP/ZAR and all major pairs</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🇿🇦</div>
+                    <h3>South African Focus</h3>
+                    <p>Priced in ZAR with local support</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🎓</div>
+                    <h3>Education</h3>
+                    <p>Learn from professional traders</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">💰</div>
+                    <h3>Affordable Pricing</h3>
+                    <p>From R1,850/month - Save up to 50% yearly</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 ForexPro SA. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms</a>
+                <a href="#">Risk Disclosure</a>
+                <a href="#">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        const navOverlay = document.getElementById('navOverlay');
+
+        if (hamburger) {
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                navOverlay.classList.toggle('active');
+                document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : 'auto';
+            });
+        }
+
+        if (navOverlay) {
+            navOverlay.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        }
+
+        document.querySelectorAll('.nav-links a').forEach(item => {
+            item.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    </script>
+</body>
+</html>

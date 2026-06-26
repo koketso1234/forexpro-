@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market - ForexPro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0D0D0D;
+            color: #FFFFFF;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(13, 13, 13, 0.98);
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        .navbar .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            text-decoration: none;
+            color: #FFFFFF;
+        }
+        .logo span { color: #6C63FF; }
+        .logo small { font-size: 12px; color: #6C63FF; font-weight: 400; margin-left: 5px; }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px;
+            gap: 4px;
+        }
+        .hamburger span {
+            width: 28px;
+            height: 2px;
+            background: #FFFFFF;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            list-style: none;
+        }
+        .nav-links a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+        .nav-links a:hover {
+            color: #FFFFFF;
+            background: rgba(108, 99, 255, 0.1);
+        }
+        .nav-links a.active {
+            color: #6C63FF;
+            background: rgba(108, 99, 255, 0.1);
+        }
+
+        .btn-nav {
+            background: linear-gradient(135deg, #6C63FF, #00D4FF);
+            color: #FFFFFF !important;
+            padding: 8px 25px !important;
+            border-radius: 25px !important;
+            font-weight: 700 !important;
+        }
+        .btn-nav:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 25px rgba(108, 99, 255, 0.3);
+        }
+
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+        .nav-overlay.active { display: block; }
+
+        .risk-banner {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #888;
+            padding: 8px 20px;
+            text-align: center;
+            font-size: 11px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .risk-banner strong { color: #6C63FF; }
+
+        .market-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .market-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .market-header h1 { font-size: 24px; font-weight: 700; }
+        .market-header h1 span { color: #6C63FF; }
+
+        .market-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .market-controls select,
+        .market-controls input {
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .market-controls select:focus,
+        .market-controls input:focus {
+            outline: none;
+            border-color: #6C63FF;
+        }
+        .market-controls select option { background: #1A1A1A; }
+
+        .timeframe-selector {
+            display: flex;
+            gap: 5px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .timeframe-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .timeframe-btn:hover {
+            border-color: #6C63FF;
+            color: #fff;
+        }
+        .timeframe-btn.active {
+            background: linear-gradient(135deg, #6C63FF, #00D4FF);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        .chart-container {
+            background: #1A1A1A;
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            min-height: 500px;
+            margin: 15px 0;
+        }
+        #tradingview_chart {
+            width: 100%;
+            height: 520px;
+            border-radius: 10px;
+            background: #0D0D0D;
+        }
+
+        .market-info {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .info-card {
+            background: #1A1A1A;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+        .info-card .label {
+            color: #888;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .info-card .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #6C63FF;
+            margin-top: 4px;
+        }
+        .info-card .value.positive { color: #00E676; }
+        .info-card .value.negative { color: #FF1744; }
+
+        .pairs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .pair-card {
+            background: #1A1A1A;
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s;
+        }
+        .pair-card:hover {
+            border-color: rgba(108, 99, 255, 0.3);
+            transform: translateY(-3px);
+        }
+        .pair-card.active {
+            border-color: #6C63FF;
+            background: rgba(108, 99, 255, 0.05);
+        }
+        .pair-card .pair-name { font-size: 13px; font-weight: 600; }
+        .pair-card .pair-price {
+            font-size: 16px;
+            font-weight: 800;
+            color: #6C63FF;
+            margin-top: 4px;
+        }
+        .pair-card .pair-change { font-size: 12px; font-weight: 600; }
+        .pair-card .pair-change.positive { color: #00E676; }
+        .pair-card .pair-change.negative { color: #FF1744; }
+        .zar-badge {
+            background: rgba(108, 99, 255, 0.1);
+            color: #6C63FF;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        @media (max-width: 1024px) { .market-info { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) {
+            .market-header { flex-direction: column; align-items: flex-start; }
+            .market-controls { width: 100%; }
+            .market-controls select,
+            .market-controls input { flex: 1; }
+            .market-info { grid-template-columns: repeat(3, 1fr); }
+            #tradingview_chart { height: 350px; }
+            .pairs-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+        }
+        @media (max-width: 480px) {
+            .market-info { grid-template-columns: repeat(2, 1fr); }
+            #tradingview_chart { height: 250px; }
+            .pairs-grid { grid-template-columns: repeat(2, 1fr); }
+            .timeframe-btn { padding: 4px 10px; font-size: 10px; }
+            .info-card .value { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="risk-banner">
+        ⚠️ <strong>RISK WARNING:</strong> Forex trading carries substantial risk. Only trade with funds you can afford to lose.
+    </div>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Forex<span>Pro</span><small>🇿🇦</small></a>
+            <button class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="market.html" class="active">Market</a></li>
+                <li><a href="chat.html">Chat</a></li>
+                <li><a href="profile.html">👤 Profile</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html" class="btn-nav">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <div class="market-container">
+        <div class="market-header">
+            <h1>📊 <span>Market</span> View</h1>
+            <div class="market-controls">
+                <select id="pairSelector" onchange="changePair()">
+                    <optgroup label="🇿🇦 ZAR Pairs">
+                        <option value="FX:USDZAR">USD/ZAR</option>
+                        <option value="FX:EURZAR">EUR/ZAR</option>
+                        <option value="FX:GBPZAR">GBP/ZAR</option>
+                        <option value="FX:AUDZAR">AUD/ZAR</option>
+                    </optgroup>
+                    <optgroup label="📈 Major">
+                        <option value="FX:EURUSD" selected>EUR/USD</option>
+                        <option value="FX:GBPUSD">GBP/USD</option>
+                        <option value="FX:USDJPY">USD/JPY</option>
+                        <option value="FX:AUDUSD">AUD/USD</option>
+                        <option value="FX:USDCAD">USD/CAD</option>
+                        <option value="FX:USDCHF">USD/CHF</option>
+                        <option value="FX:NZDUSD">NZD/USD</option>
+                    </optgroup>
+                    <optgroup label="🔄 Minor">
+                        <option value="FX:EURGBP">EUR/GBP</option>
+                        <option value="FX:EURJPY">EUR/JPY</option>
+                        <option value="FX:GBPJPY">GBP/JPY</option>
+                        <option value="FX:GBPAUD">GBP/AUD</option>
+                        <option value="FX:AUDJPY">AUD/JPY</option>
+                    </optgroup>
+                    <optgroup label="🥇 Commodities">
+                        <option value="FX:XAUUSD">Gold</option>
+                        <option value="FX:XAGUSD">Silver</option>
+                    </optgroup>
+                    <optgroup label="💰 Crypto">
+                        <option value="BINANCE:BTCUSDT">BTC/USD</option>
+                        <option value="BINANCE:ETHUSDT">ETH/USD</option>
+                    </optgroup>
+                </select>
+                <input type="text" id="searchPair" placeholder="🔍 Search..." oninput="searchPairs()">
+            </div>
+        </div>
+
+        <div class="timeframe-selector">
+            <button class="timeframe-btn" data-tf="1" onclick="changeTimeframe('1')">1m</button>
+            <button class="timeframe-btn" data-tf="5" onclick="changeTimeframe('5')">5m</button>
+            <button class="timeframe-btn" data-tf="15" onclick="changeTimeframe('15')">15m</button>
+            <button class="timeframe-btn" data-tf="30" onclick="changeTimeframe('30')">30m</button>
+            <button class="timeframe-btn active" data-tf="60" onclick="changeTimeframe('60')">1h</button>
+            <button class="timeframe-btn" data-tf="240" onclick="changeTimeframe('240')">4h</button>
+            <button class="timeframe-btn" data-tf="D" onclick="changeTimeframe('D')">1D</button>
+            <button class="timeframe-btn" data-tf="W" onclick="changeTimeframe('W')">1W</button>
+            <button class="timeframe-btn" data-tf="M" onclick="changeTimeframe('M')">1M</button>
+        </div>
+
+        <div class="chart-container">
+            <div id="tradingview_chart"></div>
+        </div>
+
+        <div class="market-info" id="marketInfo">
+            <div class="info-card"><div class="label">Pair</div><div class="value" id="infoPair">EUR/USD</div></div>
+            <div class="info-card"><div class="label">Price</div><div class="value" id="infoPrice">1.0892</div></div>
+            <div class="info-card"><div class="label">Change</div><div class="value" id="infoChange">+0.12%</div></div>
+            <div class="info-card"><div class="label">High</div><div class="value" id="infoHigh">1.0950</div></div>
+            <div class="info-card"><div class="label">Low</div><div class="value" id="infoLow">1.0840</div></div>
+            <div class="info-card"><div class="label">Updated</div><div class="value" id="infoTime" style="font-size:14px;">--:--</div></div>
+        </div>
+
+        <div style="margin-top:30px;">
+            <h3 style="color:#888;font-size:14px;font-weight:600;margin-bottom:12px;">📊 All Pairs</h3>
+            <div class="pairs-grid" id="pairsGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        const token = localStorage.getItem('token');
+
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        const navOverlay = document.getElementById('navOverlay');
+
+        if (hamburger) {
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                navOverlay.classList.toggle('active');
+                document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : 'auto';
+            });
+        }
+
+        if (navOverlay) {
+            navOverlay.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        }
+
+        document.querySelectorAll('.nav-links a').forEach(item => {
+            item.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        let currentSymbol = 'FX:EURUSD';
+        let currentTimeframe = '60';
+        let currentPairName = 'EUR/USD';
+
+        const ALL_PAIRS = [
+            { symbol: 'FX:USDZAR', name: 'USD/ZAR', isZAR: true },
+            { symbol: 'FX:EURZAR', name: 'EUR/ZAR', isZAR: true },
+            { symbol: 'FX:GBPZAR', name: 'GBP/ZAR', isZAR: true },
+            { symbol: 'FX:AUDZAR', name: 'AUD/ZAR', isZAR: true },
+            { symbol: 'FX:EURUSD', name: 'EUR/USD', isZAR: false },
+            { symbol: 'FX:GBPUSD', name: 'GBP/USD', isZAR: false },
+            { symbol: 'FX:USDJPY', name: 'USD/JPY', isZAR: false },
+            { symbol: 'FX:AUDUSD', name: 'AUD/USD', isZAR: false },
+            { symbol: 'FX:USDCAD', name: 'USD/CAD', isZAR: false },
+            { symbol: 'FX:USDCHF', name: 'USD/CHF', isZAR: false },
+            { symbol: 'FX:NZDUSD', name: 'NZD/USD', isZAR: false },
+            { symbol: 'FX:EURGBP', name: 'EUR/GBP', isZAR: false },
+            { symbol: 'FX:EURJPY', name: 'EUR/JPY', isZAR: false },
+            { symbol: 'FX:GBPJPY', name: 'GBP/JPY', isZAR: false },
+            { symbol: 'FX:GBPAUD', name: 'GBP/AUD', isZAR: false },
+            { symbol: 'FX:AUDJPY', name: 'AUD/JPY', isZAR: false },
+            { symbol: 'FX:XAUUSD', name: 'Gold', isZAR: false },
+            { symbol: 'FX:XAGUSD', name: 'Silver', isZAR: false },
+            { symbol: 'BINANCE:BTCUSDT', name: 'BTC/USD', isZAR: false },
+            { symbol: 'BINANCE:ETHUSDT', name: 'ETH/USD', isZAR: false },
+        ];
+
+        const SIMULATED_PRICES = {
+            'FX:EURUSD': { price: 1.0892, change: '+0.12%', high: 1.0950, low: 1.0840 },
+            'FX:GBPUSD': { price: 1.2650, change: '-0.08%', high: 1.2720, low: 1.2580 },
+            'FX:USDJPY': { price: 148.50, change: '+0.30%', high: 149.20, low: 147.80 },
+            'FX:AUDUSD': { price: 0.6540, change: '-0.15%', high: 0.6580, low: 0.6500 },
+            'FX:USDCAD': { price: 1.3520, change: '+0.05%', high: 1.3560, low: 1.3480 },
+            'FX:USDCHF': { price: 0.9120, change: '-0.02%', high: 0.9150, low: 0.9090 },
+            'FX:NZDUSD': { price: 0.5980, change: '+0.10%', high: 0.6020, low: 0.5950 },
+            'FX:EURGBP': { price: 0.8610, change: '+0.08%', high: 0.8650, low: 0.8570 },
+            'FX:EURJPY': { price: 161.80, change: '+0.22%', high: 162.50, low: 161.00 },
+            'FX:GBPJPY': { price: 187.90, change: '+0.18%', high: 188.80, low: 186.90 },
+            'FX:GBPAUD': { price: 1.9350, change: '+0.12%', high: 1.9420, low: 1.9280 },
+            'FX:AUDJPY': { price: 97.20, change: '+0.25%', high: 97.80, low: 96.60 },
+            'FX:XAUUSD': { price: 2345.00, change: '+0.35%', high: 2355.00, low: 2335.00 },
+            'FX:XAGUSD': { price: 27.80, change: '+0.45%', high: 28.00, low: 27.60 },
+            'BINANCE:BTCUSDT': { price: 65000.00, change: '+1.20%', high: 65500.00, low: 64500.00 },
+            'BINANCE:ETHUSDT': { price: 3500.00, change: '+0.85%', high: 3530.00, low: 3470.00 },
+            'FX:USDZAR': { price: 18.75, change: '+0.42%', high: 18.85, low: 18.65 },
+            'FX:EURZAR': { price: 20.12, change: '+0.28%', high: 20.25, low: 20.00 },
+            'FX:GBPZAR': { price: 23.45, change: '-0.15%', high: 23.60, low: 23.30 },
+            'FX:AUDZAR': { price: 12.30, change: '+0.08%', high: 12.38, low: 12.22 },
+        };
+
+        function loadChart(symbol, timeframe) {
+            const container = document.getElementById('tradingview_chart');
+            container.innerHTML = '';
+            document.querySelectorAll('script[src*="tradingview"]').forEach(s => s.remove());
+
+            const script = document.createElement('script');
+            script.src = 'https://s3.tradingview.com/tv.js';
+            script.async = true;
+
+            script.onload = function() {
+                if (typeof TradingView !== 'undefined') {
+                    try {
+                        new TradingView.widget({
+                            container_id: 'tradingview_chart',
+                            width: '100%',
+                            height: '520',
+                            symbol: symbol,
+                            interval: timeframe,
+                            timezone: 'Africa/Johannesburg',
+                            theme: 'dark',
+                            style: '1',
+                            locale: 'en',
+                            toolbar_bg: '#0D0D0D',
+                            enable_publishing: false,
+                            backgroundColor: '#0D0D0D',
+                            gridColor: '#1A1A1A',
+                            hide_top_toolbar: false,
+                            save_image: false,
+                            studies: ['RSI@tv-basicstudies', 'MASimple@tv-basicstudies'],
+                            withdateranges: true,
+                            range: '1M'
+                        });
+                    } catch (e) { showFallback(); }
+                } else { showFallback(); }
+            };
+
+            script.onerror = showFallback;
+            document.body.appendChild(script);
+
+            setTimeout(() => {
+                if (container.innerHTML.trim() === '') showFallback();
+            }, 5000);
+        }
+
+        function showFallback() {
+            const container = document.getElementById('tradingview_chart');
+            container.innerHTML = `
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#888;padding:40px;text-align:center;">
+                    <span style="font-size:48px;margin-bottom:15px;">📊</span>
+                    <p style="font-size:18px;color:#fff;">${currentPairName}</p>
+                    <p style="font-size:12px;color:#666;margin-top:10px;">${currentSymbol} • ${currentTimeframe}</p>
+                    <button onclick="location.reload()" style="margin-top:15px;padding:10px 30px;background:linear-gradient(135deg,#6C63FF,#00D4FF);color:#fff;border:none;border-radius:10px;cursor:pointer;font-weight:600;">🔄 Refresh</button>
+                </div>
+            `;
+        }
+
+        function changeTimeframe(tf) {
+            currentTimeframe = tf;
+            document.querySelectorAll('.timeframe-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.tf === tf) btn.classList.add('active');
+            });
+            loadChart(currentSymbol, tf);
+        }
+
+        function changePair() {
+            const select = document.getElementById('pairSelector');
+            currentSymbol = select.value;
+            currentPairName = select.options[select.selectedIndex].text;
+            loadChart(currentSymbol, currentTimeframe);
+            updateMarketInfo(currentSymbol);
+            searchPairs();
+        }
+
+        function searchPairs() {
+            const query = document.getElementById('searchPair').value.toLowerCase();
+            const grid = document.getElementById('pairsGrid');
+
+            let html = '';
+            const filtered = ALL_PAIRS.filter(p => p.name.toLowerCase().includes(query) || p.symbol.toLowerCase().includes(query));
+
+            filtered.forEach(pair => {
+                const data = SIMULATED_PRICES[pair.symbol] || { price: '--', change: '0%' };
+                const isPositive = data.change.startsWith('+') || data.change === '0%';
+                const isActive = currentSymbol === pair.symbol ? 'active' : '';
+                const zarBadge = pair.isZAR ? '<span class="zar-badge">🇿🇦</span>' : '';
+
+                html += `
+                    <div class="pair-card ${isActive}" onclick="selectPair('${pair.symbol}', '${pair.name}')">
+                        <div class="pair-name">${pair.name} ${zarBadge}</div>
+                        <div class="pair-price">${data.price}</div>
+                        <div class="pair-change ${isPositive ? 'positive' : 'negative'}">${data.change}</div>
+                    </div>
+                `;
+            });
+
+            if (filtered.length === 0) {
+                html = `<div style="grid-column:1/-1;text-align:center;color:#666;padding:30px;">🔍 No pairs found</div>`;
+            }
+
+            grid.innerHTML = html;
+        }
+
+        function selectPair(symbol, name) {
+            document.getElementById('pairSelector').value = symbol;
+            currentSymbol = symbol;
+            currentPairName = name;
+            loadChart(symbol, currentTimeframe);
+            updateMarketInfo(symbol);
+            searchPairs();
+        }
+
+        function updateMarketInfo(symbol) {
+            const data = SIMULATED_PRICES[symbol];
+            if (!data) return;
+
+            document.getElementById('infoPair').textContent = currentPairName;
+            document.getElementById('infoPrice').textContent = data.price;
+
+            const changeEl = document.getElementById('infoChange');
+            changeEl.textContent = data.change;
+            changeEl.className = 'value';
+            if (data.change.startsWith('+')) changeEl.classList.add('positive');
+            else if (data.change.startsWith('-')) changeEl.classList.add('negative');
+
+            document.getElementById('infoHigh').textContent = data.high;
+            document.getElementById('infoLow').textContent = data.low;
+            document.getElementById('infoTime').textContent = new Date().toLocaleTimeString('en-ZA');
+        }
+
+        function loadPairsGrid() {
+            const grid = document.getElementById('pairsGrid');
+            let html = '';
+
+            ALL_PAIRS.forEach(pair => {
+                const data = SIMULATED_PRICES[pair.symbol] || { price: '--', change: '0%' };
+                const isPositive = data.change.startsWith('+') || data.change === '0%';
+                const isActive = currentSymbol === pair.symbol ? 'active' : '';
+                const zarBadge = pair.isZAR ? '<span class="zar-badge">🇿🇦</span>' : '';
+
+                html += `
+                    <div class="pair-card ${isActive}" onclick="selectPair('${pair.symbol}', '${pair.name}')">
+                        <div class="pair-name">${pair.name} ${zarBadge}</div>
+                        <div class="pair-price">${data.price}</div>
+                        <div class="pair-change ${isPositive ? 'positive' : 'negative'}">${data.change}</div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        function updatePrices() {
+            const pairs = Object.keys(SIMULATED_PRICES);
+            pairs.forEach(pair => {
+                const data = SIMULATED_PRICES[pair];
+                const currentPrice = typeof data.price === 'string' ? parseFloat(data.price.replace(/,/g, '')) : data.price;
+                const variation = (Math.random() - 0.5) * 0.002 * currentPrice;
+                const newPrice = Math.max(0.0001, currentPrice + variation);
+                const changePercent = ((variation / currentPrice) * 100);
+                const isPositive = changePercent >= 0;
+
+                SIMULATED_PRICES[pair] = {
+                    price: newPrice.toFixed(4),
+                    change: `${isPositive ? '+' : ''}${changePercent.toFixed(2)}%`,
+                    high: Math.max(data.high || newPrice, newPrice),
+                    low: Math.min(data.low || newPrice, newPrice)
+                };
+            });
+
+            updateMarketInfo(currentSymbol);
+            loadPairsGrid();
+        }
+
+        function init() {
+            document.getElementById('pairSelector').value = 'FX:EURUSD';
+            loadPairsGrid();
+            loadChart('FX:EURUSD', '60');
+            updateMarketInfo('FX:EURUSD');
+
+            setInterval(updatePrices, 5000);
+            setInterval(() => {
+                loadChart(currentSymbol, currentTimeframe);
+            }, 30000);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

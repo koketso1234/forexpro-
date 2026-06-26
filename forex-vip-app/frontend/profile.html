@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - ForexPro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0D0D0D;
+            color: #FFFFFF;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(13, 13, 13, 0.98);
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        .navbar .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            text-decoration: none;
+            color: #FFFFFF;
+        }
+        .logo span { color: #6C63FF; }
+        .logo small { font-size: 12px; color: #6C63FF; font-weight: 400; margin-left: 5px; }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px;
+            gap: 4px;
+        }
+        .hamburger span {
+            width: 28px;
+            height: 2px;
+            background: #FFFFFF;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            list-style: none;
+        }
+        .nav-links a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+        .nav-links a:hover {
+            color: #FFFFFF;
+            background: rgba(108, 99, 255, 0.1);
+        }
+        .nav-links a.active {
+            color: #6C63FF;
+            background: rgba(108, 99, 255, 0.1);
+        }
+
+        .btn-nav {
+            background: linear-gradient(135deg, #6C63FF, #00D4FF);
+            color: #FFFFFF !important;
+            padding: 8px 25px !important;
+            border-radius: 25px !important;
+            font-weight: 700 !important;
+        }
+        .btn-nav:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 25px rgba(108, 99, 255, 0.3);
+        }
+
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+        .nav-overlay.active { display: block; }
+
+        .risk-banner {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #888;
+            padding: 8px 20px;
+            text-align: center;
+            font-size: 11px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .risk-banner strong { color: #6C63FF; }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .profile-card {
+            background: #1A1A1A;
+            padding: 35px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .profile-card h1 { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
+        .profile-card h1 span { color: #6C63FF; }
+        .profile-card .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .premium-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #6C63FF, #00D4FF);
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .free-badge {
+            display: inline-block;
+            background: #2d2d44;
+            color: #888;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            color: #888;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #6C63FF;
+            box-shadow: 0 0 20px rgba(108, 99, 255, 0.05);
+        }
+        .form-group input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #6C63FF, #00D4FF);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-save:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 40px rgba(108, 99, 255, 0.3);
+        }
+        .btn-save:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-upgrade {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #FF6D00, #FF9100);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-upgrade:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 40px rgba(255, 109, 0, 0.3);
+        }
+
+        .verified-badge {
+            display: inline-block;
+            background: rgba(0, 230, 118, 0.15);
+            color: #00E676;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .pending-badge {
+            display: inline-block;
+            background: rgba(255, 109, 0, 0.15);
+            color: #FF6D00;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .bank-details-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+            font-size: 14px;
+        }
+        .message.success {
+            display: block;
+            background: rgba(0, 230, 118, 0.1);
+            border: 1px solid #00E676;
+            color: #69F0AE;
+        }
+        .message.error {
+            display: block;
+            background: rgba(255, 23, 68, 0.1);
+            border: 1px solid #FF1744;
+            color: #FF6B81;
+        }
+        .message.info {
+            display: block;
+            background: rgba(108, 99, 255, 0.1);
+            border: 1px solid #6C63FF;
+            color: #B388FF;
+        }
+
+        .account-type-section {
+            background: rgba(108, 99, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(108, 99, 255, 0.1);
+        }
+        .account-type-section .label { color: #888; font-size: 13px; }
+        .account-type-section .value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        .account-type-section .value.premium { color: #6C63FF; }
+        .account-type-section .value.free { color: #888; }
+
+        @media (max-width: 768px) {
+            .profile-card { padding: 20px; }
+        }
+        @media (max-width: 480px) {
+            .profile-card h1 { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="risk-banner">
+        ⚠️ <strong>RISK WARNING:</strong> Forex trading carries substantial risk. Only trade with funds you can afford to lose.
+    </div>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Forex<span>Pro</span><small>🇿🇦</small></a>
+            <button class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="market.html">Market</a></li>
+                <li><a href="chat.html">Chat</a></li>
+                <li><a href="profile.html" class="active">👤 Profile</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html" class="btn-nav">Sign Up</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <div class="container">
+        <div class="profile-card">
+            <h1>👤 <span>Profile</span></h1>
+            <p class="subtitle">Manage your account settings</p>
+
+            <div id="message" class="message"></div>
+
+            <div class="account-type-section">
+                <div class="label">💎 Account Type</div>
+                <div class="value" id="accountTypeDisplay">Loading...</div>
+                <div style="margin-top:10px;">
+                    <span id="accountBadge"></span>
+                    <span id="accountStatus" style="color:#888;font-size:13px;margin-left:10px;"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>👤 Name</label>
+                <input type="text" id="userName" disabled>
+            </div>
+
+            <div class="form-group">
+                <label>📧 Email</label>
+                <input type="email" id="userEmail" disabled>
+            </div>
+
+            <div class="form-group">
+                <label>📱 Phone</label>
+                <input type="tel" id="userPhone" disabled>
+            </div>
+
+            <div class="bank-details-section" id="bankSection">
+                <h3 style="color:#6C63FF;margin-bottom:15px;">🏦 Bank Details</h3>
+                <div id="bankStatus" style="margin-bottom:15px;"></div>
+
+                <div class="form-group">
+                    <label>Account Holder Name</label>
+                    <input type="text" id="accountHolder" placeholder="Full name on account">
+                </div>
+
+                <div class="form-group">
+                    <label>Bank Name</label>
+                    <input type="text" id="bankName" placeholder="e.g., ABSA, FNB, Standard Bank">
+                </div>
+
+                <div class="form-group">
+                    <label>Account Number</label>
+                    <input type="text" id="accountNumber" placeholder="Enter account number">
+                </div>
+
+                <div class="form-group">
+                    <label>Branch Code</label>
+                    <input type="text" id="branchCode" placeholder="e.g., 632005">
+                </div>
+
+                <div class="form-group">
+                    <label>SWIFT Code</label>
+                    <input type="text" id="swiftCode" placeholder="e.g., ABSAZAJJ">
+                </div>
+
+                <div class="form-group">
+                    <label>Account Type</label>
+                    <input type="text" id="accountTypeInput" placeholder="Cheque / Savings / Current">
+                </div>
+
+                <button class="btn-save" id="saveBankBtn" onclick="saveBankDetails()">💾 Save Bank Details</button>
+            </div>
+
+            <div id="upgradeSection" style="display:none;margin-top:20px;">
+                <p style="color:#888;font-size:14px;margin-bottom:15px;">
+                    💎 Upgrade to Premium to add bank details and get exclusive signals
+                </p>
+                <button class="btn-upgrade" onclick="location.href='register.html'">🚀 Upgrade to Premium</button>
+            </div>
+
+            <div style="text-align:center;margin-top:20px;">
+                <a href="dashboard.html" style="color:#888;text-decoration:none;font-size:14px;">← Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        const token = localStorage.getItem('token');
+
+        if (!token) window.location.href = 'login.html';
+
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('navLinks');
+        const navOverlay = document.getElementById('navOverlay');
+
+        if (hamburger) {
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                navOverlay.classList.toggle('active');
+                document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : 'auto';
+            });
+        }
+
+        if (navOverlay) {
+            navOverlay.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        }
+
+        document.querySelectorAll('.nav-links a').forEach(item => {
+            item.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                navOverlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        let currentUser = null;
+
+        async function loadProfile() {
+            try {
+                const response = await fetch(`${API_URL}/users/profile`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.user;
+
+                    document.getElementById('userName').value = currentUser.name;
+                    document.getElementById('userEmail').value = currentUser.email;
+                    document.getElementById('userPhone').value = currentUser.phone || '';
+
+                    const accountTypeEl = document.getElementById('accountTypeDisplay');
+                    const badgeEl = document.getElementById('accountBadge');
+                    const statusEl = document.getElementById('accountStatus');
+
+                    if (currentUser.isAdmin) {
+                        accountTypeEl.textContent = '👑 Admin';
+                        accountTypeEl.className = 'value premium';
+                        badgeEl.innerHTML = '<span class="premium-badge">⭐ Admin</span>';
+                        statusEl.textContent = 'Full Access';
+                    } else if (currentUser.accountType === 'paid') {
+                        accountTypeEl.textContent = '💎 Premium';
+                        accountTypeEl.className = 'value premium';
+                        badgeEl.innerHTML = '<span class="premium-badge">⭐ Premium</span>';
+                        statusEl.textContent = `Active • ${currentUser.plan}`;
+                    } else {
+                        accountTypeEl.textContent = '🆓 Free';
+                        accountTypeEl.className = 'value free';
+                        badgeEl.innerHTML = '<span class="free-badge">🆓 Free</span>';
+                        statusEl.textContent = 'Basic Access';
+                    }
+
+                    const isPremium = currentUser.accountType === 'paid' || currentUser.isAdmin;
+
+                    if (isPremium) {
+                        document.getElementById('bankSection').style.display = 'block';
+                        document.getElementById('upgradeSection').style.display = 'none';
+                        await loadBankDetails();
+                    } else {
+                        document.getElementById('bankSection').style.display = 'none';
+                        document.getElementById('upgradeSection').style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showMessage('error', 'Failed to load profile');
+            }
+        }
+
+        async function loadBankDetails() {
+            try {
+                const response = await fetch(`${API_URL}/users/bank-details`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                if (data.success && data.bankDetails) {
+                    const details = data.bankDetails;
+                    document.getElementById('accountHolder').value = details.accountHolder || '';
+                    document.getElementById('bankName').value = details.bankName || '';
+                    document.getElementById('accountNumber').value = details.accountNumber || '';
+                    document.getElementById('branchCode').value = details.branchCode || '';
+                    document.getElementById('swiftCode').value = details.swiftCode || '';
+                    document.getElementById('accountTypeInput').value = details.accountType || '';
+
+                    const statusDiv = document.getElementById('bankStatus');
+                    if (details.isVerified) {
+                        statusDiv.innerHTML = '<span class="verified-badge">✅ Verified</span>';
+                    } else if (details.accountNumber) {
+                        statusDiv.innerHTML = '<span class="pending-badge">⏳ Pending Verification</span>';
+                    } else {
+                        statusDiv.innerHTML = '<span style="color:#888;font-size:13px;">No bank details added yet</span>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading bank details:', error);
+            }
+        }
+
+        async function saveBankDetails() {
+            const accountHolder = document.getElementById('accountHolder').value.trim();
+            const bankName = document.getElementById('bankName').value.trim();
+            const accountNumber = document.getElementById('accountNumber').value.trim();
+            const branchCode = document.getElementById('branchCode').value.trim();
+            const swiftCode = document.getElementById('swiftCode').value.trim();
+            const accountType = document.getElementById('accountTypeInput').value.trim();
+
+            if (!accountNumber) {
+                showMessage('error', 'Account number is required');
+                return;
+            }
+
+            const btn = document.getElementById('saveBankBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Saving...';
+
+            try {
+                const response = await fetch(`${API_URL}/users/bank-details`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ accountHolder, bankName, accountNumber, branchCode, swiftCode, accountType })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', '✅ Bank details saved successfully! Awaiting verification.');
+                    await loadBankDetails();
+                } else {
+                    showMessage('error', '❌ ' + data.error);
+                }
+            } catch (error) {
+                showMessage('error', '❌ Failed to save bank details');
+            }
+
+            btn.disabled = false;
+            btn.textContent = '💾 Save Bank Details';
+        }
+
+        function showMessage(type, text) {
+            const el = document.getElementById('message');
+            el.textContent = text;
+            el.className = `message ${type}`;
+            setTimeout(() => {
+                el.className = 'message';
+            }, 5000);
+        }
+
+        loadProfile();
+    </script>
+</body>
+</html>
