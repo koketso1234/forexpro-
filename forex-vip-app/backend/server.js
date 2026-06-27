@@ -4,22 +4,18 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const connectDB = require('./config/database');
 
-// Load environment variables
 dotenv.config();
-
-// Set timezone to South Africa
 process.env.TZ = 'Africa/Johannesburg';
 
-// Connect to MongoDB
 connectDB();
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
 // ===== ROUTES =====
+// ✅ Clean route registration - no trailing slashes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/signals', require('./routes/signals'));
 app.use('/api/admin', require('./routes/admin'));
@@ -45,7 +41,6 @@ app.get('/', (req, res) => {
         endpoints: {
             health: '/health',
             routes: '/routes',
-            testDb: '/test-db',
             auth: '/api/auth',
             signals: '/api/signals',
             admin: '/api/admin',
@@ -65,19 +60,24 @@ app.get('/routes', (req, res) => {
         for (const layer of stack) {
             if (layer.route) {
                 const methods = Object.keys(layer.route.methods).join(', ').toUpperCase();
+                let path = basePath + layer.route.path;
+                // Clean up the path
+                path = path.replace(/\/\(=\/\|\$\)\//g, '/');
                 routes.push({
-                    path: basePath + layer.route.path,
+                    path: path,
                     methods: methods
                 });
             } else if (layer.name === 'router' && layer.handle.stack) {
                 let routerPath = basePath;
                 if (layer.regexp) {
-                    const pathStr = layer.regexp.source
+                    let pathStr = layer.regexp.source
                         .replace(/\\\//g, '/')
                         .replace(/\^/g, '')
                         .replace(/\?/g, '')
                         .replace(/\(\?:\(\[\^\\\/\]\+\?\)\)/g, ':param')
                         .replace(/\/$/g, '');
+                    // Clean up the path
+                    pathStr = pathStr.replace(/\/\(=\/\|\$\)\//g, '/');
                     if (pathStr && pathStr !== '/') {
                         routerPath = pathStr;
                     }
@@ -98,42 +98,6 @@ app.get('/routes', (req, res) => {
         totalRoutes: uniqueRoutes.length,
         routes: uniqueRoutes.sort((a, b) => a.path.localeCompare(b.path))
     });
-});
-
-// ===== TEST DATABASE =====
-app.get('/test-db', async (req, res) => {
-    try {
-        const db = mongoose.connection;
-        
-        if (db.readyState === 1) {
-            const collections = await mongoose.connection.db.listCollections().toArray();
-            res.json({
-                success: true,
-                message: '✅ Database connected!',
-                databaseName: db.name,
-                collections: collections.map(c => c.name),
-                readyState: db.readyState,
-                host: db.host
-            });
-        } else {
-            res.status(500).json({
-                success: false,
-                message: '❌ Database not connected',
-                readyState: db.readyState,
-                states: {
-                    0: 'disconnected',
-                    1: 'connected',
-                    2: 'connecting',
-                    3: 'disconnecting'
-                }
-            });
-        }
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message
-        });
-    }
 });
 
 // ===== 404 HANDLER =====
