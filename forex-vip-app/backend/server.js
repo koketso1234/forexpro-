@@ -31,7 +31,42 @@ app.get('/health', (req, res) => {
         timestamp: new Date().toISOString()
     });
 });
-
+// ===== TEST DATABASE CONNECTION =====
+app.get('/test-db', async (req, res) => {
+    try {
+        const mongoose = require('mongoose');
+        const db = mongoose.connection;
+        
+        if (db.readyState === 1) {
+            const collections = await mongoose.connection.db.listCollections().toArray();
+            res.json({
+                success: true,
+                message: '✅ Database connected!',
+                databaseName: db.name,
+                collections: collections.map(c => c.name),
+                readyState: db.readyState,
+                host: db.host
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                message: '❌ Database not connected',
+                readyState: db.readyState,
+                states: {
+                    0: 'disconnected',
+                    1: 'connected',
+                    2: 'connecting',
+                    3: 'disconnecting'
+                }
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
 // ===== HOME ROUTE =====
 app.get('/', (req, res) => {
     res.json({
